@@ -4,6 +4,7 @@ const chargeValue = document.getElementById('chargeValue');
 
 slider.addEventListener('input', function() {
     chargeValue.textContent = this.value;
+    calculate();
 });
 
 function calculate() {
@@ -12,12 +13,6 @@ function calculate() {
     const currentCharge = parseInt(document.getElementById('currentCharge').value);
     const targetCharge = 90; // % (fixed)
     const chargerPower = parseFloat(document.getElementById('chargerPower').value);
-    
-    // Pengesahan input
-    if (currentCharge >= targetCharge) {
-        alert('Paras cas semasa sudah mencapai atau melebihi 90%!');
-        return;
-    }
     
     // Kira jumlah kWh yang diperlukan
     const energyNeeded = batteryCapacity * ((targetCharge - currentCharge) / 100);
@@ -43,7 +38,6 @@ function calculate() {
     
     // Paparkan keputusan
     const resultDiv = document.getElementById('result');
-    resultDiv.classList.add('show');
     
     resultDiv.innerHTML = `
         <h2>⏱️ Keputusan Pengiraan</h2>
@@ -66,8 +60,7 @@ function calculate() {
     `;
 }
 
-// Auto calculate on change
-slider.addEventListener('change', calculate);
+// Auto calculate on input change (real-time update)
 document.getElementById('chargerPower').addEventListener('change', calculate);
 
 // Calculate on page load with default values
