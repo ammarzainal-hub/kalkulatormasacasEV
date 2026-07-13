@@ -1,11 +1,32 @@
 // Update slider value display
 const slider = document.getElementById('currentCharge');
 const chargeValue = document.getElementById('chargeValue');
+const manualToggle = document.getElementById('manualToggle');
+const startTimeInput = document.getElementById('startTime');
 
 slider.addEventListener('input', function() {
     chargeValue.textContent = this.value;
     calculate();
 });
+
+manualToggle.addEventListener('change', function() {
+    startTimeInput.disabled = !this.checked;
+    if (this.checked && !startTimeInput.value) {
+        const now = new Date();
+        startTimeInput.value = pad(now.getHours()) + ':' + pad(now.getMinutes());
+    }
+    calculate();
+});
+
+startTimeInput.addEventListener('input', calculate);
+
+function pad(n) {
+    return String(n).padStart(2, '0');
+}
+
+function formatTime(date) {
+    return pad(date.getHours()) + ':' + pad(date.getMinutes());
+}
 
 function calculate() {
     // Ambil nilai dari input
@@ -36,6 +57,18 @@ function calculate() {
         timeString = `${displayMinutes} minit`;
     }
     
+    // Kira waktu mula dan waktu siap
+    let startDate = new Date();
+    if (manualToggle.checked && startTimeInput.value) {
+        const [h, m] = startTimeInput.value.split(':').map(Number);
+        startDate = new Date();
+        startDate.setHours(h, m, 0, 0);
+    }
+    const finishDate = new Date(startDate.getTime() + totalMinutes * 60000);
+
+    const sameDay = startDate.toDateString() === finishDate.toDateString();
+    const finishLabel = formatTime(finishDate) + (sameDay ? '' : ' (esok)');
+
     // Paparkan keputusan
     const resultDiv = document.getElementById('result');
     
@@ -57,6 +90,17 @@ function calculate() {
             <span class="result-label">Kuasa Pengecas:</span>
             <span class="result-value">${chargerPower} kW</span>
         </div>
+        <div class="result-clock">
+            <div class="clock-item">
+                <span class="clock-label">🕐 Waktu Mula</span>
+                <span class="clock-value">${formatTime(startDate)}</span>
+            </div>
+            <div class="clock-arrow">→</div>
+            <div class="clock-item">
+                <span class="clock-label">🔋 Siap Cas</span>
+                <span class="clock-value">${finishLabel}</span>
+            </div>
+        </div>
     `;
 }
 
@@ -65,3 +109,10 @@ document.getElementById('chargerPower').addEventListener('change', calculate);
 
 // Calculate on page load with default values
 window.addEventListener('load', calculate);
+
+// Update langsung setiap minit bila mod auto (ikut masa semasa)
+setInterval(function() {
+    if (!manualToggle.checked) {
+        calculate();
+    }
+}, 60000);
