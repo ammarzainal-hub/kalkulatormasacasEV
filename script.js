@@ -33,7 +33,9 @@ function calculate() {
     const batteryCapacity = 44.9; // kWh (fixed)
     const currentCharge = parseInt(document.getElementById('currentCharge').value);
     const targetCharge = 90; // % (fixed)
-    const chargerPower = parseFloat(document.getElementById('chargerPower').value);
+    const chargerSelect = document.getElementById('chargerPower');
+    const chargerCurrent = parseFloat(chargerSelect.value);
+    const chargerPower = parseFloat(chargerSelect.selectedOptions[0].dataset.kw);
     
     // Kira jumlah kWh yang diperlukan
     const energyNeeded = batteryCapacity * ((targetCharge - currentCharge) / 100);
@@ -88,7 +90,7 @@ function calculate() {
         </div>
         <div class="result-item">
             <span class="result-label">Kuasa Pengecas:</span>
-            <span class="result-value">${chargerPower} kW</span>
+            <span class="result-value">${chargerCurrent}A (${chargerPower} kW)</span>
         </div>
         <div class="result-clock">
             <div class="clock-item">
